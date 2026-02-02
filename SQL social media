@@ -1,0 +1,60 @@
+CREATE DATABASE IF NOT EXISTS social_media_analytics;
+USE social_media_analytics;
+
+-- ADMIN
+CREATE TABLE admin (
+    admin_id INT PRIMARY KEY AUTO_INCREMENT,
+    admin_name VARCHAR(100)
+);
+
+-- POSTS
+CREATE TABLE posts (
+    post_id INT PRIMARY KEY AUTO_INCREMENT,
+    admin_id INT,
+    FOREIGN KEY (admin_id) REFERENCES admin(admin_id)
+);
+
+-- ENGAGEMENT (Likes, Shares, Comments)
+CREATE TABLE engagement (
+    post_id INT,
+    likes INT,
+    shares INT,
+    comments INT,
+    FOREIGN KEY (post_id) REFERENCES posts(post_id)
+);
+
+-- PAGE VISITS
+CREATE TABLE page_visits (
+    admin_id INT,
+    visits INT,
+    FOREIGN KEY (admin_id) REFERENCES admin(admin_id)
+);
+
+-- SAMPLE DATA
+INSERT INTO admin (admin_name) VALUES ('Admin1');
+
+INSERT INTO posts (admin_id) VALUES (1),(1),(1);
+
+INSERT INTO engagement VALUES
+(1, 100, 20, 10),
+(2, 150, 30, 15),
+(3, 200, 40, 25);
+
+INSERT INTO page_visits VALUES
+(1, 1000),
+(1, 1200);
+
+-- Q1: How well does admin engage audience?
+SELECT 
+    a.admin_name,
+    SUM(e.likes) AS total_likes,
+    SUM(e.shares) AS total_shares,
+    SUM(e.comments) AS total_comments,
+    SUM(pv.visits) AS total_page_visits
+FROM admin a
+JOIN posts p ON a.admin_id = p.admin_id
+JOIN engagement e ON p.post_id = e.post_id
+JOIN page_visits pv ON a.admin_id = pv.admin_id
+GROUP BY a.admin_name;
+
+SELECT * FROM admin;
